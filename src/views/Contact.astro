@@ -1,0 +1,231 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EmailLink from '../components/EmailLink.astro';
+import Icon from '../components/Icon.astro';
+import PageHeader from '../components/PageHeader.astro';
+import site from '../data/site.json';
+import { routes, t, type Locale } from '../i18n';
+import { getPage } from '../lib/content';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const page = await getPage('contact', locale);
+const topics = [
+  { topic: 'keynote', label: t(locale, 'cta.keynote') },
+  { topic: 'consulting', label: t(locale, 'cta.consulting') },
+] as const;
+---
+
+<BaseLayout locale={locale} title={page.data.title} description={page.data.description} alternates={routes.contact}>
+  <PageHeader title={page.data.title} eyebrow={page.data.eyebrow} lead={page.data.lead} />
+
+  <section class="section">
+    <div class="container contact">
+      <div class="contact__main">
+        <div class="contact__options">
+          {
+            topics.map((item) => (
+              <EmailLink locale={locale} topic={item.topic} label={item.label} class="card contact__option" />
+            ))
+          }
+        </div>
+        <div class="contact__direct">
+          <h2>{t(locale, 'contact.email')}</h2>
+          <p class="contact__address">
+            <Icon name="mail" />
+            <EmailLink locale={locale} />
+          </p>
+        </div>
+        <div class="contact__direct">
+          <h2>{t(locale, 'contact.profiles')}</h2>
+          <ul class="contact__profiles">
+            {
+              site.profiles.map((p) => (
+                <li>
+                  <a href={p.url} target="_blank" rel="me noopener">
+                    {p.label}
+                    <Icon name="external" size={14} />
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+
+      <aside class="card kit" aria-labelledby="kit-title">
+        <h2 id="kit-title">{t(locale, 'contact.kit.title')}</h2>
+        {
+          page.data.shortBio && (
+            <>
+              <h3>{t(locale, 'contact.kit.shortBio')}</h3>
+              <p class="kit__bio" id="short-bio">{page.data.shortBio}</p>
+              <button
+                class="button button--secondary kit__copy"
+                type="button"
+                data-copy="short-bio"
+                data-copied={t(locale, 'contact.kit.copied')}
+              >
+                <Icon name="copy" size={18} />
+                <span>{t(locale, 'contact.kit.copy')}</span>
+              </button>
+            </>
+          )
+        }
+        <a class="kit__download" href="/downloads/michael-klesel-portrait.jpg" download>
+          <Icon name="download" size={18} />
+          {t(locale, 'contact.kit.portrait')}
+        </a>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-copy]')) {
+    const source = document.getElementById(button.dataset.copy ?? '');
+    const label = button.querySelector('span');
+    const original = label?.textContent ?? '';
+    if (!source || !navigator.clipboard) {
+      button.hidden = true;
+      continue;
+    }
+    button.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(source.textContent?.trim() ?? '');
+      if (label) {
+        label.textContent = button.dataset.copied ?? original;
+        setTimeout(() => (label.textContent = original), 2000);
+      }
+    });
+  }
+</script>
+
+<style>
+  .contact {
+    display: grid;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+
+  @media (min-width: 60rem) {
+    .contact {
+      grid-template-columns: minmax(0, 1fr) 24rem;
+    }
+  }
+
+  .contact__main {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .contact__options {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  }
+
+  .contact__options :global(.contact__option) {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-decoration: none;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .contact__options :global(.contact__option:hover) {
+    border-color: var(--color-accent);
+    box-shadow: var(--shadow-card-hover);
+    color: var(--color-accent);
+  }
+
+  .contact__options :global(.contact__option)::after {
+    content: '→';
+    margin-left: auto;
+    color: var(--color-accent);
+  }
+
+  .contact__direct h2,
+  .kit h3 {
+    margin-bottom: 0.75rem;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .contact__address {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  .contact__profiles {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .contact__profiles a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.85rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    font-size: var(--text-sm);
+    text-decoration: none;
+    color: var(--color-text);
+  }
+
+  .contact__profiles a:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .kit {
+    display: grid;
+    gap: 1rem;
+    padding: 1.75rem;
+  }
+
+  .kit h2 {
+    font-size: var(--text-xl);
+  }
+
+  .kit__bio {
+    font-size: 0.95rem;
+  }
+
+  .kit__copy {
+    justify-self: start;
+    min-height: 2.5rem;
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .kit__download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+    font-weight: 600;
+  }
+</style>

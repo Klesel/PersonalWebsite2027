@@ -1,0 +1,168 @@
+---
+import Icon from './Icon.astro';
+import { linkOf, type Publication } from '../lib/publications';
+import { t, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  publication: Publication;
+  /** Full entry for the publication list (grouped by year, with abstract and BibTeX) or a compact teaser. */
+  full?: boolean;
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { locale, publication: p, full = false, headingLevel: Heading = 'h3' } = Astro.props;
+const link = linkOf(p);
+const searchText = [p.title, p.venue, p.year, ...p.authors.map((a) => `${a.first} ${a.last}`)]
+  .join(' ')
+  .toLowerCase();
+---
+
+<article class="publication" data-category={p.category} data-search={full ? searchText : undefined}>
+  <div class="publication__meta">
+    {!full && <span class="publication__year">{p.year}</span>}
+    <span class="tag">{t(locale, `pub.type.${p.category}`)}</span>
+  </div>
+  <Heading class="publication__title">
+    {link ? <a href={link} target="_blank" rel="noopener">{p.title}</a> : p.title}
+  </Heading>
+  <p class="publication__authors">
+    {
+      p.authors.map((a, i) => (
+        <>
+          {a.isOwner ? <strong>{a.first} {a.last}</strong> : `${a.first} ${a.last}`}
+          {i < p.authors.length - 1 && ', '}
+        </>
+      ))
+    }
+    {p.edited && ` (${t(locale, 'pub.eds')})`}
+  </p>
+  <p class="publication__venue">
+    <em>{p.venue}</em>{p.details && `, ${p.details}`}
+  </p>
+  {
+    full && (
+      <div class="publication__actions">
+        {p.doi && (
+          <a class="publication__link" href={`https://doi.org/${p.doi}`} target="_blank" rel="noopener">
+            DOI: {p.doi}
+            <Icon name="external" size={14} />
+          </a>
+        )}
+        {!p.doi && p.url && (
+          <a class="publication__link" href={p.url} target="_blank" rel="noopener">
+            {new URL(p.url).hostname}
+            <Icon name="external" size={14} />
+          </a>
+        )}
+        {p.abstract && (
+          <details>
+            <summary>{t(locale, 'pub.abstract')}</summary>
+            <p class="publication__abstract" lang="en">{p.abstract}</p>
+          </details>
+        )}
+        <details>
+          <summary>{t(locale, 'pub.bibtex')}</summary>
+          <pre class="publication__bibtex"><code>{p.bibtex}</code></pre>
+        </details>
+      </div>
+    )
+  }
+</article>
+
+<style>
+  .publication {
+    display: grid;
+    gap: 0.4rem;
+    padding-block: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .publication__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: var(--text-sm);
+  }
+
+  .publication__year {
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+
+  .publication__title {
+    font-size: 1.15rem;
+    line-height: 1.35;
+  }
+
+  .publication__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .publication__title a:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .publication__authors,
+  .publication__venue {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+  }
+
+  .publication__authors strong {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .publication__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.5rem 1.25rem;
+    margin-top: 0.4rem;
+    font-size: var(--text-sm);
+  }
+
+  .publication__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    word-break: break-all;
+  }
+
+  details {
+    flex-basis: auto;
+  }
+
+  details[open] {
+    flex-basis: 100%;
+  }
+
+  summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+
+  .publication__abstract {
+    margin-top: 0.5rem;
+    max-width: 52rem;
+    font-size: 0.95rem;
+    color: var(--color-text);
+  }
+
+  .publication__bibtex {
+    margin-top: 0.5rem;
+    padding: 1rem;
+    overflow-x: auto;
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+</style>

@@ -1,0 +1,94 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CtaBand from '../components/CtaBand.astro';
+import EmailLink from '../components/EmailLink.astro';
+import Icon from '../components/Icon.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Steps from '../components/Steps.astro';
+import Testimonials from '../components/Testimonials.astro';
+import { routes, t, type Locale } from '../i18n';
+import { getPage } from '../lib/content';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const page = await getPage('consulting', locale);
+const { Content } = await render(page);
+const icons = ['compass', 'mic', 'arrow', 'book'] as const;
+---
+
+<BaseLayout locale={locale} title={page.data.title} description={page.data.description} alternates={routes.consulting}>
+  <PageHeader title={page.data.title} eyebrow={page.data.eyebrow} lead={page.data.lead}>
+    <div class="button-row header-actions">
+      <EmailLink locale={locale} topic="consulting" label={t(locale, 'cta.consulting')} class="button" icon />
+    </div>
+  </PageHeader>
+
+  {
+    page.data.sections && (
+      <section class="section" aria-labelledby="offers-title">
+        <div class="container">
+          <h2 id="offers-title" class="section__header">{t(locale, 'consulting.offers')}</h2>
+          <div class="grid grid--2">
+            {page.data.sections.map((offer, i) => (
+              <article class="card offer">
+                <span class="offer__icon">
+                  <Icon name={icons[i % icons.length]} size={22} />
+                </span>
+                <h3>{offer.title}</h3>
+                <p>{offer.text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section section--subtle">
+    <div class="container">
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </section>
+
+  {page.data.steps && <Steps title={t(locale, 'consulting.process')} steps={page.data.steps} />}
+
+  <Testimonials locale={locale} />
+  <CtaBand locale={locale} />
+</BaseLayout>
+
+<style>
+  .header-actions {
+    margin-top: 2rem;
+  }
+
+  .offer {
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+    padding: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  .offer__icon {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+
+  .offer p {
+    color: var(--color-text-muted);
+  }
+
+  .prose :global(h2:first-child) {
+    margin-top: 0;
+  }
+</style>

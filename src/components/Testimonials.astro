@@ -1,0 +1,76 @@
+---
+// Quotes from src/data/testimonials.json. Renders nothing while the list is empty.
+import { getCollection } from 'astro:content';
+import testimonialList from '../data/testimonials.json';
+import { t, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+// Skip the collection while the list is empty to avoid Astro's "empty collection" warning.
+const testimonials = testimonialList.length ? await getCollection('testimonials') : [];
+---
+
+{
+  testimonials.length > 0 && (
+    <section class="section section--subtle" aria-labelledby="testimonials-title">
+      <div class="container">
+        <h2 id="testimonials-title" class="section__header">
+          {t(locale, 'testimonials.title')}
+        </h2>
+        <div class="grid grid--3">
+          {testimonials.map(({ data }) => (
+            <figure class="card testimonial">
+              <blockquote lang={data.lang}>
+                <p>{data.quote}</p>
+              </blockquote>
+              <figcaption>
+                <strong>{data.name}</strong>
+                <span>
+                  {data.role[locale]}, {data.organisation}
+                </span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .testimonial {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1.75rem;
+  }
+
+  blockquote {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    line-height: 1.55;
+    color: var(--color-primary);
+  }
+
+  blockquote p::before {
+    content: '“';
+  }
+
+  blockquote p::after {
+    content: '”';
+  }
+
+  figcaption {
+    display: grid;
+    margin-top: auto;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  figcaption strong {
+    color: var(--color-text);
+  }
+</style>

@@ -1,0 +1,29 @@
+{
+  "name": "Michael Klesel",
+  "honorific": "Prof. Dr.",
+  "email": {
+    "user": "websitecontact",
+    "domain": "klesel.info"
+  },
+  "affiliation": {
+    "name": "Frankfurt University of Applied Sciences",
+    "department": {
+      "de": "Fachbereich 3: Wirtschaft und Recht",
+      "en": "Faculty 3: Business and Law"
+    },
+    "url": "https://www.frankfurt-university.de/de/hochschule/fachbereich-3-wirtschaft-und-recht/kontakt/professor-innen/michael-klesel/"
+  },
+  "jobTitle": {
+    "de": "Professor für Wirtschaftsinformatik",
+    "en": "Professor of Information Systems"
+  },
+  "profiles": [
+    { "id": "linkedin", "label": "LinkedIn", "url": "https://www.linkedin.com/in/klesel/" },
+    { "id": "scholar", "label": "Google Scholar", "url": "https://scholar.google.com/citations?user=KV23qFwAAAAJ" },
+    { "id": "orcid", "label": "ORCID", "url": "https://orcid.org/0000-0002-2884-1819" },
+    { "id": "researchgate", "label": "ResearchGate", "url": "https://www.researchgate.net/profile/Michael-Klesel-2" },
+    { "id": "github", "label": "GitHub", "url": "https://github.com/Klesel" },
+    { "id": "mastodon", "label": "Mastodon", "url": "https://fosstodon.org/@Klesel" }
+  ],
+  "featuredPublications": ["KleselMesser2026", "Klesel_2025", "hamm_explanation_2023"]
+}

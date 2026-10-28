@@ -1,0 +1,81 @@
+---
+// Photos from src/data/photos.json. Renders nothing while the list is empty.
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import photoList from '../data/photos.json';
+import { t, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  limit?: number;
+}
+
+const { locale, limit } = Astro.props;
+// Skip the collection while the list is empty to avoid Astro's "empty collection" warning.
+const photos = photoList.length ? (await getCollection('photos')).slice(0, limit) : [];
+---
+
+{
+  photos.length > 0 && (
+    <section class="section" aria-labelledby="gallery-title">
+      <div class="container">
+        <h2 id="gallery-title" class="section__header">
+          {t(locale, 'keynote.gallery')}
+        </h2>
+        <ul class="gallery">
+          {photos.map((photo) => (
+            <li>
+              <figure>
+                <Image
+                  src={photo.data.image}
+                  alt={photo.data.alt[locale]}
+                  widths={[480, 800, 1200]}
+                  sizes="(min-width: 48rem) 33vw, 100vw"
+                  loading="lazy"
+                />
+                {(photo.data.caption || photo.data.credit) && (
+                  <figcaption>
+                    {photo.data.caption?.[locale]}
+                    {photo.data.credit && <span class="credit">© {photo.data.credit}</span>}
+                  </figcaption>
+                )}
+              </figure>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .gallery {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  }
+
+  figure {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  img {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: var(--radius);
+  }
+
+  figcaption {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .credit {
+    display: block;
+    font-size: 0.8rem;
+  }
+</style>

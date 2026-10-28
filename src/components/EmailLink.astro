@@ -1,0 +1,54 @@
+---
+// Email link that is assembled in the browser, so the address does not appear
+// in the HTML source for spam harvesters. Without JavaScript the link leads to the
+// contact page, where the address is shown as text.
+import Icon from './Icon.astro';
+import site from '../data/site.json';
+import { routes, t, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  topic?: 'keynote' | 'consulting' | 'general';
+  /** Visible text. Defaults to the email address. */
+  label?: string;
+  class?: string;
+  icon?: boolean;
+}
+
+const { locale, topic = 'general', label, class: className, icon = false } = Astro.props;
+const subject = t(locale, `contact.subject.${topic}`);
+const body = topic === 'general' ? '' : t(locale, `contact.body.${topic}`);
+const fallback = `${site.email.user} [at] ${site.email.domain}`;
+---
+
+<a
+  class:list={[className]}
+  href={routes.contact[locale]}
+  data-email
+  data-user={site.email.user}
+  data-domain={site.email.domain}
+  data-subject={subject}
+  data-body={body}
+  data-show-address={label ? undefined : ''}
+>
+  {icon && <Icon name="mail" />}
+  <span data-email-text>{label ?? fallback}</span>
+</a>
+{!label && <noscript><span class="visually-hidden">{t(locale, 'contact.noscript')}</span></noscript>}
+
+<script>
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-email]')) {
+    const { user, domain, subject, body } = link.dataset;
+    const address = `${user}@${domain}`;
+    const params = new URLSearchParams();
+    if (subject) params.set('subject', subject);
+    if (body) params.set('body', body);
+    // URLSearchParams encodes spaces as "+", which mail clients show literally.
+    const query = params.toString().replaceAll('+', '%20');
+    link.href = `mailto:${address}${query ? `?${query}` : ''}`;
+    if (link.dataset.showAddress !== undefined) {
+      const text = link.querySelector('[data-email-text]');
+      if (text) text.textContent = address;
+    }
+  }
+</script>

@@ -1,0 +1,63 @@
+---
+// Apache serves this page for every unknown URL, so it is bilingual.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { routes, t } from '../i18n';
+---
+
+<BaseLayout locale="de" title={t('de', 'notFound.title')} description={t('de', 'notFound.text')} alternates={routes.home} noindex>
+  <section class="section not-found">
+    <div class="container container--narrow">
+      <p class="not-found__code" aria-hidden="true">404</p>
+      <div class="not-found__grid">
+        <div>
+          <h1>{t('de', 'notFound.title')}</h1>
+          <p>{t('de', 'notFound.text')}</p>
+          <a class="button" href={routes.home.de}>{t('de', 'notFound.home')}</a>
+        </div>
+        <div lang="en">
+          <h2>{t('en', 'notFound.title')}</h2>
+          <p>{t('en', 'notFound.text')}</p>
+          <a class="button button--secondary" href={routes.home.en}>{t('en', 'notFound.home')}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found__code {
+    font-family: var(--font-heading);
+    font-size: clamp(4rem, 15vw, 8rem);
+    font-weight: 600;
+    line-height: 1;
+    color: var(--color-accent-soft);
+    -webkit-text-stroke: 2px var(--color-accent);
+  }
+
+  .not-found__grid {
+    display: grid;
+    gap: 2.5rem;
+    margin-top: 2rem;
+  }
+
+  @media (min-width: 48rem) {
+    .not-found__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .not-found__grid > div {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+
+  h1,
+  h2 {
+    font-size: var(--text-2xl);
+  }
+
+  p {
+    color: var(--color-text-muted);
+  }
+</style>

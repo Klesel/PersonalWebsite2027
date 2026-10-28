@@ -1,0 +1,271 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import PageHeader from '../components/PageHeader.astro';
+import PublicationItem from '../components/PublicationItem.astro';
+import site from '../data/site.json';
+import { routes, t, type Locale } from '../i18n';
+import { getPage } from '../lib/content';
+import { getPublications, linkOf, type PublicationCategory } from '../lib/publications';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const page = await getPage('publications', locale);
+const publications = getPublications(locale);
+
+const years = [...new Set(publications.map((p) => p.year))];
+const categories: ('all' | PublicationCategory)[] = ['all', 'journal', 'conference', 'other'];
+const countOf = (c: (typeof categories)[number]) =>
+  c === 'all' ? publications.length : publications.filter((p) => p.category === c).length;
+const profiles = site.profiles.filter((p) => ['scholar', 'orcid', 'researchgate'].includes(p.id));
+
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: publications.map((p, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'ScholarlyArticle',
+        headline: p.title,
+        datePublished: String(p.year),
+        author: p.authors.map((a) => ({ '@type': 'Person', name: `${a.first} ${a.last}` })),
+        ...(linkOf(p) && { url: linkOf(p) }),
+        ...(p.doi && { identifier: `https://doi.org/${p.doi}` }),
+      },
+    })),
+  },
+];
+---
+
+<BaseLayout
+  locale={locale}
+  title={page.data.title}
+  description={page.data.description}
+  alternates={routes.publications}
+  structuredData={structuredData}
+>
+  <PageHeader title={page.data.title} eyebrow={page.data.eyebrow} lead={page.data.lead}>
+    <div class="pub-links">
+      <a href="/publications.bib" download>
+        <Icon name="download" size={18} />
+        {t(locale, 'pub.download')}
+      </a>
+      {
+        profiles.map((p) => (
+          <a href={p.url} target="_blank" rel="noopener">
+            {p.label}
+            <Icon name="external" size={14} />
+          </a>
+        ))
+      }
+    </div>
+  </PageHeader>
+
+  <section class="section">
+    <div class="container container--narrow">
+      <form class="filters" data-filters hidden role="search">
+        <fieldset class="filters__types">
+          <legend class="visually-hidden">{t(locale, 'pub.filter.type')}</legend>
+          {
+            categories.map((c) => (
+              <label class="chip">
+                <input type="radio" name="category" value={c} checked={c === 'all'} />
+                <span>
+                  {t(locale, `pub.type.${c}`)} <span class="chip__count">{countOf(c)}</span>
+                </span>
+              </label>
+            ))
+          }
+        </fieldset>
+        <label class="filters__search">
+          <span class="visually-hidden">{t(locale, 'pub.filter.search')}</span>
+          <input type="search" name="q" placeholder={t(locale, 'pub.filter.searchPlaceholder')} autocomplete="off" />
+        </label>
+      </form>
+
+      <p class="pub-count" aria-live="polite" data-count data-template={t(locale, 'pub.count')}>
+        {t(locale, 'pub.count', { n: publications.length })}
+      </p>
+      <p class="pub-none" data-none hidden>{t(locale, 'pub.none')}</p>
+
+      {
+        years.map((year) => (
+          <section class="year-group" data-year-group aria-labelledby={`y${year}`}>
+            <h2 id={`y${year}`} class="year-group__title">
+              {year}
+            </h2>
+            {publications
+              .filter((p) => p.year === year)
+              .map((p) => (
+                <PublicationItem locale={locale} publication={p} full />
+              ))}
+          </section>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-filters]');
+  const count = document.querySelector<HTMLElement>('[data-count]');
+  const none = document.querySelector<HTMLElement>('[data-none]');
+  const items = [...document.querySelectorAll<HTMLElement>('.publication[data-category]')];
+  const groups = [...document.querySelectorAll<HTMLElement>('[data-year-group]')];
+
+  if (form) {
+    form.hidden = false;
+
+    const apply = () => {
+      const data = new FormData(form);
+      const category = String(data.get('category') ?? 'all');
+      const terms = String(data.get('q') ?? '')
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(Boolean);
+
+      let visible = 0;
+      for (const item of items) {
+        const text = item.dataset.search ?? '';
+        const show =
+          (category === 'all' || item.dataset.category === category) && terms.every((term) => text.includes(term));
+        item.hidden = !show;
+        if (show) visible++;
+      }
+      for (const group of groups) {
+        group.hidden = !group.querySelector('.publication:not([hidden])');
+      }
+      if (count?.dataset.template) count.textContent = count.dataset.template.replace('{n}', String(visible));
+      if (none) none.hidden = visible > 0;
+    };
+
+    form.addEventListener('input', apply);
+    form.addEventListener('submit', (event) => event.preventDefault());
+  }
+</script>
+
+<style>
+  .pub-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+    margin-top: 1.75rem;
+    font-weight: 500;
+  }
+
+  .pub-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .filters {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .filters[hidden] {
+    display: none;
+  }
+
+  .filters__types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    border: 0;
+    padding: 0;
+  }
+
+  .chip input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .chip > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .chip:hover > span {
+    border-color: var(--color-accent);
+  }
+
+  .chip input:checked + span {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-accent-contrast);
+  }
+
+  .chip input:focus-visible + span {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .chip__count {
+    font-size: 0.8rem;
+    opacity: 0.85;
+  }
+
+  .filters__search input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+  }
+
+  .filters__search input:focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 0;
+    border-color: var(--color-accent);
+  }
+
+  .filters__search input::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  .pub-count,
+  .pub-none {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .year-group {
+    margin-top: 2.5rem;
+  }
+
+  .year-group[hidden] {
+    display: none;
+  }
+
+  .year-group__title {
+    position: sticky;
+    top: 4.5rem;
+    z-index: 1;
+    padding-block: 0.5rem;
+    background: var(--color-bg);
+    border-bottom: 2px solid var(--color-primary);
+    font-size: var(--text-xl);
+  }
+
+  :global(.publication[hidden]) {
+    display: none;
+  }
+</style>

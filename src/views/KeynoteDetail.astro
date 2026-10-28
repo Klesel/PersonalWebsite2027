@@ -1,0 +1,164 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CtaBand from '../components/CtaBand.astro';
+import EmailLink from '../components/EmailLink.astro';
+import Icon from '../components/Icon.astro';
+import PageHeader from '../components/PageHeader.astro';
+import PublicationItem from '../components/PublicationItem.astro';
+import { routes, t, type Locale } from '../i18n';
+import { getKeynotes, keynoteAlternates } from '../lib/content';
+import { getPublicationsByKey } from '../lib/publications';
+
+type Keynote = Awaited<ReturnType<typeof getKeynotes>>[number];
+
+interface Props {
+  locale: Locale;
+  keynote: Keynote;
+}
+
+const { locale, keynote } = Astro.props;
+const { Content } = await render(keynote);
+const alternates = await keynoteAlternates(keynote.name);
+const related = getPublicationsByKey(locale, keynote.data.relatedPublications).sort((a, b) => b.year - a.year);
+---
+
+<BaseLayout locale={locale} title={keynote.data.title} description={keynote.data.description} alternates={alternates}>
+  <PageHeader title={keynote.data.title} eyebrow="Keynote" lead={keynote.data.subtitle}>
+    <div class="button-row header-actions">
+      <EmailLink locale={locale} topic="keynote" label={t(locale, 'cta.keynote')} class="button" icon />
+    </div>
+  </PageHeader>
+
+  <section class="section">
+    <div class="container keynote-layout">
+      <div class="keynote-main">
+        <div class="prose">
+          <Content />
+        </div>
+        <h2 class="keynote-heading">{t(locale, 'keynote.takeaways')}</h2>
+        <ul class="check-list">
+          {keynote.data.takeaways.map((item) => <li>{item}</li>)}
+        </ul>
+      </div>
+
+      <aside class="card keynote-facts">
+        <h2>{t(locale, 'keynote.audience')}</h2>
+        <ul>
+          {keynote.data.audience.map((item) => <li>{item}</li>)}
+        </ul>
+        <h2>{t(locale, 'keynote.formats')}</h2>
+        <ul>
+          {keynote.data.formats.map((item) => <li>{item}</li>)}
+        </ul>
+        <EmailLink locale={locale} topic="keynote" label={t(locale, 'cta.keynote')} class="button keynote-facts__cta" />
+      </aside>
+    </div>
+  </section>
+
+  {
+    related.length > 0 && (
+      <section class="section section--subtle" aria-labelledby="research-title">
+        <div class="container container--narrow">
+          <h2 id="research-title">{t(locale, 'keynote.research')}</h2>
+          <div class="related">
+            {related.map((p) => (
+              <PublicationItem locale={locale} publication={p} />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <div class="container back">
+    <a href={routes.keynotes[locale]}>
+      <Icon name="arrowLeft" size={18} />
+      {t(locale, 'keynote.back')}
+    </a>
+  </div>
+
+  <CtaBand locale={locale} />
+</BaseLayout>
+
+<style>
+  .header-actions {
+    margin-top: 2rem;
+  }
+
+  .keynote-layout {
+    display: grid;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+
+  @media (min-width: 60rem) {
+    .keynote-layout {
+      grid-template-columns: minmax(0, 1fr) 20rem;
+    }
+
+    .keynote-facts {
+      position: sticky;
+      top: 6.5rem;
+    }
+  }
+
+  .keynote-main .prose {
+    font-size: 1.1rem;
+  }
+
+  .keynote-heading {
+    margin: 2.5rem 0 1.25rem;
+    font-size: var(--text-xl);
+  }
+
+  .keynote-facts {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1.75rem;
+  }
+
+  .keynote-facts h2 {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .keynote-facts h2:not(:first-child) {
+    margin-top: 0.75rem;
+  }
+
+  .keynote-facts ul {
+    padding-left: 1.1rem;
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .keynote-facts__cta {
+    margin-top: 1rem;
+    width: 100%;
+  }
+
+  .related {
+    margin-top: 1rem;
+  }
+
+  .back {
+    padding-block: 2.5rem;
+  }
+
+  .back a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .back a:hover {
+    text-decoration: underline;
+  }
+</style>

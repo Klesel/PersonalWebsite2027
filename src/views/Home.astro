@@ -1,0 +1,280 @@
+---
+import { Picture } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CtaBand from '../components/CtaBand.astro';
+import EmailLink from '../components/EmailLink.astro';
+import Gallery from '../components/Gallery.astro';
+import Icon from '../components/Icon.astro';
+import KeynoteCard from '../components/KeynoteCard.astro';
+import PublicationItem from '../components/PublicationItem.astro';
+import Testimonials from '../components/Testimonials.astro';
+import portrait from '../assets/portrait.jpg';
+import site from '../data/site.json';
+import { routes, t, type Locale } from '../i18n';
+import { getKeynotes, getPage, keynotePath } from '../lib/content';
+import { getPublicationsByKey } from '../lib/publications';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const page = await getPage('home', locale);
+const keynotes = await getKeynotes(locale);
+const featured = getPublicationsByKey(locale, site.featuredPublications);
+const proofIcons = ['book', 'mic', 'globe'] as const;
+---
+
+<BaseLayout locale={locale} description={page.data.description} alternates={routes.home}>
+  <section class="hero">
+    <div class="container hero__inner">
+      <div class="hero__text">
+        <span class="eyebrow">{page.data.eyebrow}</span>
+        <h1>{page.data.title}</h1>
+        <p class="hero__lead">{page.data.lead}</p>
+        <div class="button-row">
+          <EmailLink locale={locale} topic="keynote" label={t(locale, 'cta.keynote')} class="button" icon />
+          <a class="button button--secondary" href={routes.keynotes[locale]}>
+            {t(locale, 'cta.allKeynotes')}
+          </a>
+        </div>
+      </div>
+      <div class="hero__media">
+        <Picture
+          src={portrait}
+          alt={`${site.honorific} ${site.name}`}
+          formats={['avif', 'webp']}
+          widths={[320, 480, 720]}
+          sizes="(min-width: 60rem) 24rem, 70vw"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+    </div>
+  </section>
+
+  {
+    page.data.sections && (
+      <section class="proof" aria-label={page.data.eyebrow}>
+        <div class="container">
+          <ul class="proof__list">
+            {page.data.sections.map((item, i) => (
+              <li>
+                <span class="proof__icon">
+                  <Icon name={proofIcons[i % proofIcons.length]} size={22} />
+                </span>
+                <div>
+                  <h2 class="proof__title">{item.title}</h2>
+                  <p>{item.text}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section" aria-labelledby="topics-title">
+    <div class="container">
+      <div class="section__header section__header--row">
+        <div>
+          <span class="eyebrow">{t(locale, 'nav.keynotes')}</span>
+          <h2 id="topics-title">{t(locale, 'home.topics.title')}</h2>
+        </div>
+        <a class="more-link" href={routes.keynotes[locale]}>
+          {t(locale, 'cta.allKeynotes')}
+          <Icon name="arrow" size={18} />
+        </a>
+      </div>
+      <div class="grid grid--3">
+        {
+          keynotes.map((k, i) => (
+            <KeynoteCard
+              locale={locale}
+              index={i}
+              href={keynotePath(locale, k.data.slug)}
+              title={k.data.title}
+              subtitle={k.data.subtitle}
+              description={k.data.description}
+            />
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <Testimonials locale={locale} />
+
+  <section class="section section--subtle" aria-labelledby="research-title">
+    <div class="container">
+      <div class="section__header section__header--row">
+        <div>
+          <span class="eyebrow">{t(locale, 'nav.publications')}</span>
+          <h2 id="research-title">{t(locale, 'home.publications.title')}</h2>
+        </div>
+        <a class="more-link" href={routes.publications[locale]}>
+          {t(locale, 'home.publications.all')}
+          <Icon name="arrow" size={18} />
+        </a>
+      </div>
+      <div class="grid grid--3">
+        {
+          featured.map((p) => (
+            <div class="card featured-pub">
+              <PublicationItem locale={locale} publication={p} />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <Gallery locale={locale} limit={3} />
+
+  <CtaBand locale={locale} />
+</BaseLayout>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(3.5rem, 9vw, 7rem);
+    background:
+      radial-gradient(55rem 30rem at 85% 10%, var(--color-accent-soft), transparent 65%),
+      var(--color-bg);
+  }
+
+  .hero__inner {
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 4rem);
+    align-items: center;
+  }
+
+  @media (min-width: 60rem) {
+    .hero__inner {
+      grid-template-columns: 1.4fr 1fr;
+    }
+  }
+
+  .hero__text {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+  }
+
+  .hero__text .eyebrow {
+    margin-bottom: 0;
+  }
+
+  .hero__lead {
+    max-width: 38rem;
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+  }
+
+  .hero__text .button-row {
+    margin-top: 0.75rem;
+  }
+
+  .hero__media {
+    position: relative;
+    justify-self: center;
+    width: min(100% - 1.5rem, 24rem);
+  }
+
+  .hero__media::before {
+    content: '';
+    position: absolute;
+    inset: 1.25rem -1.25rem -1.25rem 1.25rem;
+    border: 2px solid var(--color-accent);
+    border-radius: calc(var(--radius) * 2);
+    opacity: 0.35;
+  }
+
+  .hero__media :global(img) {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: calc(var(--radius) * 2);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .proof {
+    border-block: 1px solid var(--color-border);
+    background: var(--color-bg-subtle);
+  }
+
+  .proof__list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 1.75rem 2.5rem;
+    padding-block: clamp(2rem, 5vw, 3rem);
+  }
+
+  @media (min-width: 48rem) {
+    .proof__list {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .proof__list li {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .proof__icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+
+  .proof__title {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .proof p {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  .section__header--row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    max-width: none;
+  }
+
+  .more-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .more-link:hover {
+    text-decoration: underline;
+  }
+
+  .featured-pub {
+    padding: 0 1.5rem;
+  }
+
+  .featured-pub :global(.publication) {
+    border-bottom: 0;
+  }
+</style>

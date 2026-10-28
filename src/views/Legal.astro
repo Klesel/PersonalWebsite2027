@@ -1,0 +1,51 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EmailLink from '../components/EmailLink.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { routes, t, type Locale } from '../i18n';
+import { getPage } from '../lib/content';
+
+interface Props {
+  locale: Locale;
+  name: 'imprint' | 'privacy';
+}
+
+const { locale, name } = Astro.props;
+const page = await getPage(name, locale);
+const { Content } = await render(page);
+---
+
+<BaseLayout
+  locale={locale}
+  title={page.data.title}
+  description={page.data.description}
+  alternates={routes[name]}
+>
+  <PageHeader title={page.data.title} />
+  <section class="section">
+    <div class="container">
+      {
+        name === 'imprint' && (
+          <p class="legal-email">
+            {t(locale, 'contact.email')}: <EmailLink locale={locale} />
+          </p>
+        )
+      }
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal-email {
+    margin-bottom: 2rem;
+    font-weight: 500;
+  }
+
+  .prose :global(h2:first-child) {
+    margin-top: 0;
+  }
+</style>

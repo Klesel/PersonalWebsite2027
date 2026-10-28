@@ -1,0 +1,95 @@
+---
+import '../styles/global.css';
+import { getImage } from 'astro:assets';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ThemeScript from '../components/ThemeScript.astro';
+import portrait from '../assets/portrait.jpg';
+import site from '../data/site.json';
+import { defaultLocale, htmlLang, locales, ogLocale, otherLocale, type Alternates, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  /** Page title without the site name. Omit on the home page. */
+  title?: string;
+  description: string;
+  alternates: Alternates;
+  /** Additional JSON-LD objects for this page. */
+  structuredData?: Record<string, unknown>[];
+  noindex?: boolean;
+}
+
+const { locale, title, description, alternates, structuredData = [], noindex = false } = Astro.props;
+
+const fullName = `${site.honorific} ${site.name}`;
+const pageTitle = title ? `${title} | ${site.name}` : `${fullName} – ${site.jobTitle[locale]}`;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const absolute = (path: string) => new URL(path, Astro.site).href;
+
+const ogImage = await getImage({ src: portrait, width: 1200, height: 1200, format: 'jpg', quality: 82 });
+
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  '@id': absolute('/#person'),
+  name: site.name,
+  honorificPrefix: site.honorific,
+  jobTitle: site.jobTitle[locale],
+  url: absolute(alternates[locale]),
+  image: absolute(ogImage.src),
+  worksFor: {
+    '@type': 'CollegeOrUniversity',
+    name: site.affiliation.name,
+    url: 'https://www.frankfurt-university.de/',
+  },
+  knowsAbout: ['Artificial Intelligence', 'AI Adoption', 'Sustainable AI', 'Information Systems'],
+  sameAs: site.profiles.map((p) => p.url),
+};
+---
+
+<!doctype html>
+<html lang={htmlLang[locale]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <ThemeScript />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={site.name} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    {
+      !noindex &&
+        locales.map((l) => <link rel="alternate" hreflang={l} href={absolute(alternates[l])} />)
+    }
+    {!noindex && <link rel="alternate" hreflang="x-default" href={absolute(alternates[defaultLocale])} />}
+
+    <meta name="theme-color" content="#0b2545" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e1726" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={fullName} />
+    <meta property="og:title" content={title ?? pageTitle} />
+    <meta property="og:description" content={description} />
+    {!noindex && <meta property="og:url" content={canonical} />}
+    <meta property="og:locale" content={ogLocale[locale]} />
+    <meta property="og:locale:alternate" content={ogLocale[otherLocale(locale)]} />
+    <meta property="og:image" content={absolute(ogImage.src)} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="1200" />
+    <meta property="og:image:alt" content={fullName} />
+    <meta name="twitter:card" content="summary" />
+
+    <script type="application/ld+json" set:html={JSON.stringify([person, ...structuredData])} />
+  </head>
+  <body>
+    <Header locale={locale} alternates={alternates} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer locale={locale} />
+  </body>
+</html>

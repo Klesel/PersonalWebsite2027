@@ -1,0 +1,105 @@
+---
+import Icon from './Icon.astro';
+import { t, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  href: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  index: number;
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { locale, href, title, subtitle, description, index, headingLevel: Heading = 'h3' } = Astro.props;
+---
+
+<article class="card keynote-card">
+  <span class="keynote-card__number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+  <Heading class="keynote-card__title">
+    <a href={href}>{title}</a>
+  </Heading>
+  <p class="keynote-card__subtitle">{subtitle}</p>
+  <p class="keynote-card__text">{description}</p>
+  <span class="keynote-card__more" aria-hidden="true">
+    {t(locale, 'cta.learnMore')}
+    <Icon name="arrow" size={18} />
+  </span>
+</article>
+
+<style>
+  .keynote-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: clamp(1.5rem, 3vw, 2rem);
+    transition:
+      box-shadow 0.2s ease,
+      transform 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .keynote-card:hover {
+    box-shadow: var(--shadow-card-hover);
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .keynote-card:focus-within {
+    border-color: var(--color-accent);
+  }
+
+  .keynote-card__number {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+
+  .keynote-card__title {
+    font-size: var(--text-xl);
+  }
+
+  .keynote-card__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Make the whole card clickable while keeping a single link for screen readers. */
+  .keynote-card__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius);
+  }
+
+  .keynote-card__title a:focus-visible {
+    outline: none;
+  }
+
+  .keynote-card__title a:focus-visible::after {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  .keynote-card__subtitle {
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  .keynote-card__text {
+    color: var(--color-text-muted);
+  }
+
+  .keynote-card__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: auto;
+    padding-top: 0.5rem;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+</style>

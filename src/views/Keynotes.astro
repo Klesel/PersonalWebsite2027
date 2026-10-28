@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Gallery from '../components/Gallery.astro';
+import KeynoteCard from '../components/KeynoteCard.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Steps from '../components/Steps.astro';
+import Testimonials from '../components/Testimonials.astro';
+import { routes, t, type Locale } from '../i18n';
+import { getKeynotes, getPage, keynotePath } from '../lib/content';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const page = await getPage('keynotes', locale);
+const keynotes = await getKeynotes(locale);
+---
+
+<BaseLayout locale={locale} title={page.data.title} description={page.data.description} alternates={routes.keynotes}>
+  <PageHeader title={page.data.title} eyebrow={page.data.eyebrow} lead={page.data.lead} />
+
+  <section class="section" aria-label={t(locale, 'home.topics.title')}>
+    <div class="container grid grid--3">
+      {
+        keynotes.map((k, i) => (
+          <KeynoteCard
+            locale={locale}
+            index={i}
+            href={keynotePath(locale, k.data.slug)}
+            title={k.data.title}
+            subtitle={k.data.subtitle}
+            description={k.data.description}
+            headingLevel="h2"
+          />
+        ))
+      }
+    </div>
+  </section>
+
+  {page.data.steps && <Steps title={t(locale, 'keynotes.process')} steps={page.data.steps} />}
+
+  <Testimonials locale={locale} />
+  <Gallery locale={locale} />
+  <CtaBand locale={locale} />
+</BaseLayout>

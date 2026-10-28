@@ -1,0 +1,46 @@
+# Builds and tests every pull request and every push.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  ASTRO_TELEMETRY_DISABLED: 1
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install exact dependencies from package-lock.json
+        run: npm ci
+
+      - name: Contrast, type check, build and internal links
+        run: npm test
+
+      - name: Lighthouse (accessibility, SEO, best practices, performance)
+        run: npm run lighthouse
+
+      - name: External links (warnings only)
+        run: npm run check:links:external
+        continue-on-error: true
+
+      - name: Keep the built site
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: site
+          path: dist/
+          include-hidden-files: true
+          retention-days: 30

@@ -1,0 +1,66 @@
+---
+interface Props {
+  title: string;
+  steps: { title: string; text: string }[];
+}
+
+const { title, steps } = Astro.props;
+---
+
+<section class="section" aria-labelledby="steps-title">
+  <div class="container">
+    <h2 id="steps-title" class="section__header">{title}</h2>
+    <ol class="steps">
+      {
+        steps.map((step) => (
+          <li class="steps__item">
+            <h3>{step.title}</h3>
+            <p>{step.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .steps {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 1.5rem;
+    counter-reset: step;
+  }
+
+  @media (min-width: 48rem) {
+    .steps {
+      grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    }
+  }
+
+  .steps__item {
+    counter-increment: step;
+    padding-top: 1.25rem;
+    border-top: 2px solid var(--color-border);
+  }
+
+  .steps__item::before {
+    content: counter(step, decimal-leading-zero);
+    display: block;
+    margin-bottom: 0.5rem;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+
+  h3 {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    margin-bottom: 0.35rem;
+  }
+
+  p {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+</style>

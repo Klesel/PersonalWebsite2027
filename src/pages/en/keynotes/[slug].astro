@@ -1,0 +1,13 @@
+---
+import KeynoteDetail from '../../../views/KeynoteDetail.astro';
+import { getKeynotes } from '../../../lib/content';
+
+export async function getStaticPaths() {
+  const keynotes = await getKeynotes('en');
+  return keynotes.map((keynote) => ({ params: { slug: keynote.data.slug }, props: { keynote } }));
+}
+
+const { keynote } = Astro.props;
+---
+
+<KeynoteDetail locale="en" keynote={keynote} />

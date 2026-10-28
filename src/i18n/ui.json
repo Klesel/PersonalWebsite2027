@@ -1,0 +1,106 @@
+{
+  "site.tagline": {
+    "de": "Keynotes und Beratung zu Künstlicher Intelligenz",
+    "en": "Keynotes and consulting on artificial intelligence"
+  },
+
+  "nav.label": { "de": "Hauptnavigation", "en": "Main navigation" },
+  "nav.home": { "de": "Start", "en": "Home" },
+  "nav.keynotes": { "de": "Keynotes", "en": "Keynotes" },
+  "nav.consulting": { "de": "Beratung", "en": "Consulting" },
+  "nav.about": { "de": "Über mich", "en": "About" },
+  "nav.publications": { "de": "Publikationen", "en": "Publications" },
+  "nav.contact": { "de": "Kontakt", "en": "Contact" },
+  "nav.menu": { "de": "Menü", "en": "Menu" },
+  "nav.skip": { "de": "Zum Inhalt springen", "en": "Skip to content" },
+
+  "lang.switch": { "de": "English version", "en": "Deutsche Version" },
+  "lang.short": { "de": "EN", "en": "DE" },
+
+  "theme.toggle": { "de": "Farbschema wechseln", "en": "Toggle colour scheme" },
+  "theme.toDark": { "de": "Zum dunklen Farbschema wechseln", "en": "Switch to dark colour scheme" },
+  "theme.toLight": { "de": "Zum hellen Farbschema wechseln", "en": "Switch to light colour scheme" },
+
+  "cta.keynote": { "de": "Keynote anfragen", "en": "Request a keynote" },
+  "cta.consulting": { "de": "Beratung anfragen", "en": "Request consulting" },
+  "cta.contact": { "de": "Kontakt aufnehmen", "en": "Get in touch" },
+  "cta.allKeynotes": { "de": "Alle Keynote-Themen", "en": "All keynote topics" },
+  "cta.learnMore": { "de": "Mehr erfahren", "en": "Learn more" },
+  "cta.band.title": {
+    "de": "Sie planen eine Veranstaltung oder ein KI-Vorhaben?",
+    "en": "Planning an event or an AI initiative?"
+  },
+  "cta.band.text": {
+    "de": "Schreiben Sie mir kurz, worum es geht – ich melde mich mit einem Vorschlag.",
+    "en": "Send me a short note about what you have in mind and I will get back to you with a proposal."
+  },
+
+  "home.topics.title": { "de": "Themen", "en": "Topics" },
+  "home.publications.title": { "de": "Aktuelle Forschung", "en": "Recent research" },
+  "home.publications.all": { "de": "Alle Publikationen", "en": "All publications" },
+
+  "keynotes.process": { "de": "So läuft eine Anfrage ab", "en": "How it works" },
+  "consulting.offers": { "de": "Angebote", "en": "Services" },
+  "consulting.process": { "de": "Ablauf", "en": "Process" },
+  "about.focus": { "de": "Schwerpunkte", "en": "Focus areas" },
+  "keynote.audience": { "de": "Für wen", "en": "Who it is for" },
+  "keynote.takeaways": { "de": "Was Ihr Publikum mitnimmt", "en": "What your audience takes away" },
+  "keynote.formats": { "de": "Formate", "en": "Formats" },
+  "keynote.research": { "de": "Forschungsgrundlage", "en": "Research background" },
+  "keynote.back": { "de": "Alle Keynote-Themen", "en": "All keynote topics" },
+  "keynote.gallery": { "de": "Eindrücke von Vorträgen", "en": "Impressions from past talks" },
+
+  "testimonials.title": { "de": "Stimmen von Veranstaltern", "en": "What organisers say" },
+
+  "pub.filter.type": { "de": "Publikationsart", "en": "Publication type" },
+  "pub.filter.search": { "de": "Suche", "en": "Search" },
+  "pub.filter.searchPlaceholder": { "de": "Titel, Autor:in, Journal …", "en": "Title, author, venue …" },
+  "pub.type.all": { "de": "Alle", "en": "All" },
+  "pub.type.journal": { "de": "Zeitschriftenartikel", "en": "Journal articles" },
+  "pub.type.conference": { "de": "Konferenzbeiträge", "en": "Conference papers" },
+  "pub.type.other": { "de": "Weitere", "en": "Other" },
+  "pub.count": { "de": "{n} Publikationen", "en": "{n} publications" },
+  "pub.none": { "de": "Keine Publikationen gefunden.", "en": "No publications found." },
+  "pub.abstract": { "de": "Abstract", "en": "Abstract" },
+  "pub.bibtex": { "de": "BibTeX", "en": "BibTeX" },
+  "pub.download": { "de": "Alle Einträge als BibTeX herunterladen", "en": "Download all entries as BibTeX" },
+  "pub.profiles": { "de": "Profile", "en": "Profiles" },
+  "pub.eds": { "de": "Hrsg.", "en": "Eds." },
+  "pub.thesis": { "de": "Dissertation", "en": "Doctoral thesis" },
+
+  "contact.email": { "de": "E-Mail", "en": "Email" },
+  "contact.subject.keynote": { "de": "Keynote-Anfrage", "en": "Keynote request" },
+  "contact.subject.consulting": { "de": "Beratungsanfrage", "en": "Consulting request" },
+  "contact.subject.general": { "de": "Anfrage über klesel.info", "en": "Enquiry via klesel.info" },
+  "contact.body.keynote": {
+    "de": "Guten Tag Herr Klesel,\n\nwir möchten Sie für eine Keynote anfragen.\n\nVeranstaltung:\nDatum:\nOrt / online:\nPublikum (Zielgruppe, Anzahl):\nGewünschtes Thema:\nDauer:\nSprache (DE/EN):\n\nViele Grüße\n",
+    "en": "Dear Professor Klesel,\n\nWe would like to invite you to give a keynote.\n\nEvent:\nDate:\nLocation / online:\nAudience (who, how many):\nPreferred topic:\nLength:\nLanguage (EN/DE):\n\nKind regards\n"
+  },
+  "contact.body.consulting": {
+    "de": "Guten Tag Herr Klesel,\n\nwir interessieren uns für eine Beratung.\n\nOrganisation:\nAusgangslage / Anliegen:\nGewünschtes Format:\nZeitrahmen:\n\nViele Grüße\n",
+    "en": "Dear Professor Klesel,\n\nWe are interested in consulting.\n\nOrganisation:\nSituation / request:\nPreferred format:\nTimeframe:\n\nKind regards\n"
+  },
+  "contact.noscript": {
+    "de": "Bitte ersetzen Sie [at] durch @.",
+    "en": "Please replace [at] with @."
+  },
+  "contact.kit.title": { "de": "Für Veranstalter", "en": "For event organisers" },
+  "contact.kit.shortBio": { "de": "Kurzbiografie", "en": "Short bio" },
+  "contact.kit.portrait": { "de": "Porträtfoto herunterladen (JPG)", "en": "Download portrait photo (JPG)" },
+  "contact.kit.copy": { "de": "Text kopieren", "en": "Copy text" },
+  "contact.kit.copied": { "de": "Kopiert", "en": "Copied" },
+  "contact.profiles": { "de": "Online-Profile", "en": "Online profiles" },
+
+  "footer.legal": { "de": "Rechtliches", "en": "Legal" },
+  "footer.imprint": { "de": "Impressum", "en": "Imprint" },
+  "footer.privacy": { "de": "Datenschutz", "en": "Privacy" },
+  "footer.profiles": { "de": "Profile", "en": "Profiles" },
+  "footer.pages": { "de": "Seiten", "en": "Pages" },
+
+  "notFound.title": { "de": "Seite nicht gefunden", "en": "Page not found" },
+  "notFound.text": {
+    "de": "Die gesuchte Seite existiert nicht oder wurde verschoben.",
+    "en": "The page you are looking for does not exist or has moved."
+  },
+  "notFound.home": { "de": "Zur Startseite", "en": "Go to the home page" }
+}

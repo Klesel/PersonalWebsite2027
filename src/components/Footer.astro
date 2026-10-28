@@ -1,0 +1,133 @@
+---
+import site from '../data/site.json';
+import { routes, t, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const year = new Date().getFullYear();
+const pages = (['keynotes', 'consulting', 'about', 'publications', 'contact'] as const).map((key) => ({
+  href: routes[key][locale],
+  label: t(locale, `nav.${key}`),
+}));
+---
+
+<footer class="site-footer">
+  <div class="container site-footer__grid">
+    <div class="site-footer__about">
+      <p class="site-footer__name">{site.honorific} {site.name}</p>
+      <p>{site.jobTitle[locale]}<br />{site.affiliation.name}</p>
+      <p class="site-footer__tagline">{t(locale, 'site.tagline')}</p>
+    </div>
+
+    <nav aria-label={t(locale, 'footer.pages')}>
+      <h2 class="site-footer__heading">{t(locale, 'footer.pages')}</h2>
+      <ul>
+        {pages.map((p) => <li><a href={p.href}>{p.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <nav aria-label={t(locale, 'footer.profiles')}>
+      <h2 class="site-footer__heading">{t(locale, 'footer.profiles')}</h2>
+      <ul>
+        {
+          site.profiles.map((p) => (
+            <li>
+              <a href={p.url} rel="me noopener" target="_blank">
+                {p.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <nav aria-label={t(locale, 'footer.legal')}>
+      <h2 class="site-footer__heading">{t(locale, 'footer.legal')}</h2>
+      <ul>
+        <li><a href={routes.imprint[locale]}>{t(locale, 'footer.imprint')}</a></li>
+        <li><a href={routes.privacy[locale]}>{t(locale, 'footer.privacy')}</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="container site-footer__bottom">
+    <p>© {year} {site.name}</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: auto;
+    padding-top: clamp(3rem, 6vw, 4.5rem);
+    background: var(--color-bg-subtle);
+    border-top: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  .site-footer__grid {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  }
+
+  .site-footer__about {
+    grid-column: span 2;
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+  }
+
+  @media (max-width: 30rem) {
+    .site-footer__about {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .site-footer__name {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  .site-footer__tagline {
+    max-width: 22rem;
+  }
+
+  .site-footer__heading {
+    margin-bottom: 0.75rem;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .site-footer__bottom {
+    margin-top: 2.5rem;
+    padding-block: 1.5rem;
+    border-top: 1px solid var(--color-border);
+    font-size: var(--text-sm);
+  }
+</style>
